@@ -46,18 +46,6 @@ The binary contains both the backend and frontend. You only need to provide a co
 ./bugnexus-linux-amd64 --db "user:pass@tcp(localhost:3306)/bugnexus"
 ```
 
-#### Option C: Custom DockerHub Push
-If you want to host your community edition image on DockerHub:
-
-**Windows (PowerShell)**
-```powershell
-.\scripts\push_dockerhub.ps1
-```
-
-**Linux/macOS (Shell)**
-```bash
-./scripts/push_dockerhub.sh
-```
 
 ### 3. Architecture
 BugNexus uses a decoupled architecture:
@@ -92,14 +80,14 @@ BugNexus Community Edition is licensed under a custom **Commercial-Prohibited** 
 
 ## 🤝 Community & Support
 
-BugNexus is powered by **Nexus Web Tools**.
+BugNexus is powered by **Coding Nexus LLC**.
 
 - [Explore DomainVitals](https://domainvitals.dev) - Insights for your web vitals and SEO.
 - [Documentation](https://docs.bugnexus.com)
-- [Report a Bug](https://github.com/NexusWebTools/BugNexus/issues)
+- [Report a Bug](https://github.com/CodingNexusLLC/BugNexus/issues)
 
 ---
 
 <p align="center">
-  Made with ❤️ by the Nexus Web Tools Team
+  Made with ❤️ by the Coding Nexus Team
 </p>
