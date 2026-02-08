@@ -1,93 +1,114 @@
-# BugNexus Community Edition 🚀
+# BugNexus
 
-![BugNexus Hero Image](bugnexus_hero.png)
+BugNexus is a high-performance, self-hostable error tracking system (Sentry-compatible) designed for efficiency and scale. It handles "error storms" using a buffered ingestion pipeline and creates a seamless developer experience with a single-binary distribution.
 
-> **The high-performance, Sentry-compatible error tracking system for modern engineering teams.**
+## 🚀 Features
 
-BugNexus is a self-hostable, efficient, and scalable error tracking platform designed to give you full control over your telemetry data. Written in Go (Backend) and Vue.js (Frontend), it offers lightning-fast ingestion and a premium developer experience without the enterprise price tag.
+*   **High Performance Ingestion:** Non-blocking API with buffered channels and bulk DB inserts.
+*   **Sentry Compatibility:** Drop-in replacement for Sentry SDKs (Go, JS, Python, etc.).
+*   **Multi-Tenancy:** Row-level security for Organizations, Projects, and Teams.
+*   **Single Binary:** Frontend (Vue.js) is embedded into the Go binary for easy deployment.
+*   **Enterprise Ready:**
+    *   **SAML SSO:** Support for Okta, Auth0, Google, etc.
+    *   **RBAC:** Admin/Viewer roles.
+    *   **Audit Logs:** Track all sensitive actions.
+*   **Real-time Dashboard:** Live issue stream and 24-hour event volume trends.
+
+> [!TIP]
+> **Complete your monitoring stack!**
+> While BugNexus tracks your app errors, [DomainVitals.dev](https://domainvitals.dev) provides an all-in-one toolbox for Uptime, SEO, Web Vitals, and SSL monitoring. Combine them for absolute visibility.
 
 ---
 
-## ✨ Key Features
+## 🛠 Tech Stack
 
-- **Sentry-Compatible API**: Drop-in replacement for your existing Sentry SDKs.
-- **Real-Time Dashboards**: Visualize error spikes and trends as they happen with SSE-powered live updates.
-- **ARM64 Native**: Optimized for AWS Graviton and modern cloud infrastructure.
-- **Smart Fingerprinting**: Automatically groups related errors using configurable rules.
-- **High-Performance Ingestion**: Optimized buffered pipeline capable of handling thousands of events per second.
-- **Clean Vue 3 UI**: A sleek, minimal dashboard built for speed and clarity.
-- **Role-Based Access Control**: Manage teams, organizations, and project permissions.
+*   **Backend:** Go 1.23+ (Fiber, sqlc, gosaml2)
+*   **Database:** MariaDB / MySQL 8.0+ (InnoDB)
+*   **Frontend:** Vue.js 3, Tailwind CSS, Chart.js
+*   **Infrastructure:** Docker Compose, Redis (optional for caching/queues)
 
----
+## 📦 Installation & Setup
 
-## 🚀 Quick Start with Docker
+### Prerequisites
+*   Docker & Docker Compose
+*   Go 1.23+ (for local dev)
+*   Node.js 20+ (for frontend dev)
 
-Deploy your own BugNexus instance in seconds using Docker Compose.
+### Quick Start (Docker)
 
-### 1. Requirements
-- Docker & Docker Compose
-- MariaDB / MySQL
-- Redis (Optional, for caching and rate limiting)
-- ClickHouse (For long-term event storage)
+1.  **Configure:**
+    Ensure `docker-compose.yml` has the correct `APP_URL`.
+    ```yaml
+    environment:
+      - APP_URL=http://localhost:8082 # Accessible URL of the instance
+    ```
 
-### 2. Deployment Options
+2.  **Run:**
+    ```bash
+    docker-compose up --build -d
+    ```
 
-#### Option A: Docker Compose (Recommended)
-Deploy the full stack (App + DBs) in seconds:
+3.  **Access:**
+    *   Dashboard: `http://localhost:8082`
+    *   Default Admin: Register via the UI (first user becomes admin of their org).
+
+### Configuration
+
+Environment Variables:
+
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `DB_DSN` | MySQL Connection String | (Localhost DSN) |
+| `APP_URL` | Public URL (Required for SAML/OAuth) | `http://localhost:3000` |
+| `JWT_SECRET` | Secret for session tokens | `secret` |
+| `SMTP_FROM` | Sender address for emails | `noreply@bugnexus.local` |
+| `RUN_MIGRATIONS` | Auto-apply DB schemas on startup | `true` |
+
+### Enterprise Configuration
+
+#### SAML SSO Setup
+1.  Log in as an **Admin**.
+2.  Navigate to **Organization Settings > Auth**.
+3.  Enter your Identity Provider (IdP) details:
+    *   **Entrypoint:** The IdP SSO URL.
+    *   **Issuer:** The Entity ID of the IdP.
+    *   **Certificate:** The X.509 Certificate (PEM format).
+4.  Configure your IdP:
+    *   **ACS URL / Callback:** `{APP_URL}/api/auth/sso/{ORG_ID}/callback`
+    *   **Audience URI / Entity ID:** `{APP_URL}/api/auth/sso/{ORG_ID}/callback`
+
+
+## 🏗 Development
+
+### Backend
 ```bash
-docker-compose up -d
+go run cmd/server/main.go
 ```
 
-#### Option B: Standalone Binary
-Download the latest pre-compiled binary for your OS from your private storage.
-The binary contains both the backend and frontend. You only need to provide a connection string to your MariaDB instance.
+### Frontend
 ```bash
-# Example for Linux
-./bugnexus-linux-amd64 --db "user:pass@tcp(localhost:3306)/bugnexus"
+cd frontend
+npm install
+npm run dev
 ```
 
+### Building for Production (Community Edition)
 
-### 3. Architecture
-BugNexus uses a decoupled architecture:
-- **BugNexus Image**: Contains ONLY the application binary and the embedded frontend.
-- **Infrastructure Services**: Databases like MariaDB, Redis, and ClickHouse are **NOT** bundled inside the BugNexus image. You must run them alongside the app (e.g., using `docker-compose`).
+To build a standalone, optimized binary (backend + frontend) for distribution without sources:
 
----
+#### Windows (PowerShell)
+```powershell
+.\scripts\build_community.ps1
+```
 
-### 4. Access the Dashboard
-Open your browser and navigate to:
-`http://localhost:8082`
+#### Linux/macOS (Shell)
+```bash
+./scripts/build_community.sh
+```
 
----
-
-## 🔒 Security & Privacy
-
-We take data sovereignty seriously.
-- **Self-Hosted**: Your data never leaves your infrastructure.
-- **Obfuscated Assets**: Frontend assets are obfuscated to protect intellectual property in the Community Edition.
-- **JWT-Based Auth**: Secure session management and API key rotation.
+These scripts build the frontend, embed the assets into the Go binary, strip debug symbols, and compress the final executable using UPX.
 
 ---
 
-## 📜 Licensing
-
-BugNexus Community Edition is licensed under a custom **Commercial-Prohibited** license.
-- ✅ **Free for internal use** in your organization.
-- ❌ **Commercial redistribution** or SaaS reselling is prohibited.
-- ❌ **No Regress**: Provided "as is" with no warranty.
-
----
-
-## 🤝 Community & Support
-
-BugNexus is powered by **Coding Nexus LLC**.
-
-- [Explore DomainVitals](https://domainvitals.dev) - Insights for your web vitals and SEO.
-- [Documentation](https://docs.bugnexus.com)
-- [Report a Bug](https://github.com/CodingNexusLLC/BugNexus/issues)
-
----
-
-<p align="center">
-  Made with ❤️ by the Coding Nexus Team
-</p>
+## 🛡️ License
+BugNexus is distributed under the **BugNexus Community License**. It is free for internal use but carries **NO WARRANTY** and strictly **LIMITS LIABILITY** for CodingNexusLLC / domainvitals.dev. See [LICENSE.md](LICENSE.md) for details.
